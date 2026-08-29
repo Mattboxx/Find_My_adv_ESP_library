@@ -15,7 +15,9 @@ BLE backend selection, provider rotation, and optional motion sensing.
    down a shared controller. Bluedroid is an explicit compatibility option,
    not the default.
 5. The scheduler publishes one provider. When both are enabled it rotates them
-   after `providerWindowMs`.
+   after `providerWindowMs`. The requested value is clamped to at least three
+   stationary advertising intervals so a provider is not repeatedly removed
+   before nearby devices have a practical chance to observe it.
 6. By default a small FreeRTOS task polls motion and the provider scheduler.
    Manual mode delegates this step to the host's `loop()`.
 7. `reconfigure()` stops the scheduler, copies a complete new configuration,
@@ -33,7 +35,9 @@ least-significant-byte-first representation.
 The optional Bluedroid backend uses the raw advertising-data completion event
 before starting the advertiser. Its configuration is asynchronous in ESP-IDF;
 starting before that event is a common cause of apparently successful firmware
-that never transmits.
+that never transmits. While a stop/configure/start sequence is pending, the
+scheduler does not overwrite its address or payload. The provider window begins
+only after the GAP start-complete event confirms successful advertising.
 
 ## BLE ownership
 

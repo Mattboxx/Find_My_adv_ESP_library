@@ -314,7 +314,13 @@ void gapCallback(esp_gap_ble_cb_event_t event,
             bluedroidAdvertising =
                 parameters->adv_start_cmpl.status == ESP_BT_STATUS_SUCCESS;
             pendingRestart = false;
-            if (!bluedroidAdvertising) activeInterval = 0;
+            if (bluedroidAdvertising) {
+                // Start the provider window only when the controller confirms
+                // that this payload is actually on air.
+                lastSwitch = millis();
+            } else {
+                activeInterval = 0;
+            }
             break;
         default:
             break;
@@ -371,6 +377,12 @@ void schedulerPoll() {
     if (!running) return;
     updateAccelerometer();
 
+#if FINDMYADV_USE_BLUEDROID
+    // Raw GAP reconfiguration is asynchronous. Never overwrite the pending
+    // address/payload while stop -> configure -> start is still in flight.
+    if (pendingRestart) return;
+#endif
+
     const bool dualProvider = appleEnabled && googleEnabled;
     const bool switchWindow = millis() - lastSwitch >= cfg.providerWindowMs;
     if (!switchWindow && activeInterval == currentIntervalMs()) return;
@@ -387,7 +399,9 @@ void schedulerPoll() {
     } else if (googleEnabled) {
         startProvider(googleAddr, googleAdv, sizeof(googleAdv));
     }
+#if !FINDMYADV_USE_BLUEDROID
     if (switchWindow) lastSwitch = millis();
+#endif
 }
 
 void schedulerTaskEntry(void *) {
@@ -430,7 +444,14 @@ bool FindMyAdvClass::begin(const FindMyAdvConfig &configuration) {
         cfg.advertisingIntervalMs = 2000;
     if (cfg.motionIntervalMs < 20 || cfg.motionIntervalMs > 10240)
         cfg.motionIntervalMs = 200;
-    if (cfg.providerWindowMs < 100) cfg.providerWindowMs = 5000;
+    // Each provider must remain continuously active long enough to emit at
+    // least three stationary advertisements. Very short windows repeatedly
+    // stop Apple before nearby devices have a reliable chance to observe it.
+    const uint32_t minimumProviderWindowMs =
+        cfg.advertisingIntervalMs * 3 > 1000
+            ? cfg.advertisingIntervalMs * 3 : 1000;
+    if (cfg.providerWindowMs < minimumProviderWindowMs)
+        cfg.providerWindowMs = minimumProviderWindowMs;
     if (cfg.schedulerTaskStackBytes < 2048)
         cfg.schedulerTaskStackBytes = 2048;
 

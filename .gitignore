@@ -1,4 +1,5 @@
 .pio/
+ci/src/idf_component.yml
 *.tar.gz
 *.zip
 FindMyAdv-configured.zip
