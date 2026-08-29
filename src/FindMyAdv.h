@@ -9,7 +9,7 @@ struct FindMyAdvConfig {
     const char *googleAdvertisementEidHex = "";
     uint32_t advertisingIntervalMs = 2000;
     int8_t txPowerDbm = 0;
-    uint32_t providerWindowMs = 5000;
+    uint32_t providerWindowMs = 6000;
 
     bool accelerometerEnabled = false;
     TwoWire *accelerometerWire = nullptr;

@@ -4,6 +4,21 @@ All notable changes to FindMyAdv are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Changed
+
+- Increased the default provider window from 5 to 6 seconds.
+- Provider windows are now clamped to at least three stationary advertising
+  intervals, with an absolute minimum of one second.
+
+### Fixed
+
+- Bluedroid no longer advances or overwrites a provider while its asynchronous
+  stop/configure/start sequence is still pending.
+- Bluedroid provider timing now starts after the controller confirms that the
+  new payload is actually advertising, rather than when configuration begins.
+
 ## [1.1.0] - 2026-07-14
 
 ### Changed

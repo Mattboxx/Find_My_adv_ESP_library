@@ -322,7 +322,9 @@ tracking.motionDetectedCallback = moved;
 - No radio can advertise during ESP deep sleep. Stop the library before sleep
   and call `begin()` again after wake-up.
 - Advertising two providers is time-slicing, not two simultaneous legacy radio
-  packets. `providerWindowMs` controls the rotation window.
+  packets. `providerWindowMs` controls the requested rotation window and is
+  clamped to at least three stationary advertising intervals (minimum one
+  second), preventing short windows from starving one provider.
 
 ## Security
 

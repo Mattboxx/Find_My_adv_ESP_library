@@ -29,6 +29,9 @@ advertisement; `begin()` no longer reports success in that state.
 With two valid keys, wait longer than `providerWindowMs` while scanning. The
 providers share one legacy advertising set and are intentionally time-sliced.
 Check `isAppleEnabled()` and `isGoogleEnabled()` to detect a malformed key.
+FindMyAdv keeps each provider active for at least three stationary advertising
+intervals. Do not implement a second application-level loop that stops or
+reconfigures the advertiser more frequently.
 
 ## Motion mode never activates
 

@@ -8,7 +8,7 @@
 | `googleAdvertisementEidHex` | `""` | 20-byte Google advertisement EID encoded as 40 hexadecimal characters; empty disables Google |
 | `advertisingIntervalMs` | `2000` | BLE interval while stationary, clamped to the controller range 20–10240 ms |
 | `txPowerDbm` | `0` | Requested advertising power, mapped to the nearest ESP controller level |
-| `providerWindowMs` | `5000` | Time assigned to one provider before Apple/Google rotation; minimum 100 ms |
+| `providerWindowMs` | `6000` | Requested provider window; clamped to at least three stationary advertisement intervals (and at least 1 second) |
 | `accelerometerEnabled` | `false` | Enables LIS3DH/LIS2DH/LIS2DH12 motion detection |
 | `accelerometerWire` | `&Wire` | I2C bus instance; point it to `Wire1` or another initialized bus when required |
 | `initializeAccelerometerBus` | `true` | Calls `begin(SDA, SCL)` on the selected bus; set false if the host firmware already initialized it |
